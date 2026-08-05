@@ -1,0 +1,48 @@
+{
+  "project_name": "Farm2Home",
+  "archetype": "ORGANIC & EARTHY",
+  "theme": "Fresh Earth & Forest Green",
+  "typography": {
+    "heading_font": "Playfair Display",
+    "body_font": "Plus Jakarta Sans",
+    "mono_font": "JetBrains Mono"
+  },
+  "colors": {
+    "primary": "#2D5A27",
+    "primary_dark": "#1E3D1A",
+    "secondary": "#E5A93B",
+    "accent": "#C44536",
+    "background_light": "#F9F8F5",
+    "background_card": "#FFFFFF",
+    "text_dark": "#1B2A17",
+    "text_muted": "#5C7153",
+    "border_subtle": "#E2E8DE"
+  },
+  "visual_enhancers": {
+    "border_radius": "rounded-2xl",
+    "glassmorphism": "backdrop-blur-xl bg-white/80 border border-white/40 shadow-[0_8px_32px_rgba(45,90,39,0.08)]",
+    "texture": "subtle grain noise overlay"
+  },
+  "grids": {
+    "bento_hero": "grid grid-cols-1 md:grid-cols-12 gap-8",
+    "product_catalog": "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6",
+    "dashboard_stats": "grid grid-cols-1 md:grid-cols-4 gap-6"
+  },
+  "motion": {
+    "hover_card": "transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl",
+    "button_press": "active:scale-95 transition-transform"
+  },
+  "image_urls": {
+    "hero_farm": "https://images.unsplash.com/photo-1615829254885-d4bfd5ce700e",
+    "fresh_produce_market": "https://images.pexels.com/photos/15279908/pexels-photo-15279908.jpeg",
+    "farmer_harvest": "https://images.unsplash.com/photo-1633410195091-bd66114cef5f",
+    "artisan_goods": "https://images.unsplash.com/photo-1441122538760-c0466b6b44b9"
+  },
+  "universal_guidelines": [
+    "Never use pure black or pure white; tint with warm forest green and cream.",
+    "All interactive elements must include data-testid attributes for robust automated testing.",
+    "Use generous spacing (p-8, gap-8) for a luxurious, unhurried artisan feel.",
+    "Ensure high contrast ratios for accessibility across all product cards and stats widgets.",
+    "Use Shadcn/UI primitives customized with earthy forest green and warm amber accents."
+  ]
+}
