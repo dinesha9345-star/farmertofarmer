@@ -34,7 +34,7 @@ export default function WishlistPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {wishlistedProducts.map((prod) => (
-            <div key={prod.id} className="bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-emerald-100 dark:border-zinc-800 shadow-sm relative flex flex-col group">
+            <div key={prod.id} className="bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-emerald-100 dark:border-zinc-800 shadow-sm relative flex flex-col group" data-testid={`product-card-${prod.id}`}>
               <button 
                 onClick={() => toggleWishlist(prod.id)}
                 className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 dark:bg-zinc-800/90 flex items-center justify-center text-rose-600 shadow-md"

@@ -49,7 +49,7 @@ export default function AdminDashboard() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <Stat icon={DollarSign} label="Total Revenue" value={`₹${Number(stats.revenue || 0).toLocaleString('en-IN')}`} sub="from paid orders" testid="stat-revenue" />
-          <Stat icon={Users} label="Verified Farmers" value={stats.farmers} sub={`${stats.customers} customers`} testid="stat-farmers" />
+          <Stat icon={Users} label="Verified Farmers" value={stats.farmers} sub={`${stats.customers} customers on platform`} testid="stat-farmers" />
           <Stat icon={Package} label="Products" value={stats.products} sub="live on marketplace" testid="stat-products" />
           <Stat icon={TrendingUp} label="Total Orders" value={stats.orders} sub="all time" testid="stat-orders" />
         </div>
@@ -59,7 +59,7 @@ export default function AdminDashboard() {
           <div className="divide-y divide-zinc-100 dark:divide-zinc-800 text-xs">
             {farmers.length === 0 && <div className="py-4 text-zinc-400 text-center">No farmers registered.</div>}
             {farmers.map((f) => (
-              <div key={f.id} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div key={f.id} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-center justify-between gap-4" data-testid={`farmer-row-${f.id}`}>
                 <div className="flex items-center gap-4">
                   <img src={f.avatar} alt={f.name} className="w-12 h-12 rounded-full object-cover border-2 border-emerald-500" />
                   <div>
@@ -83,7 +83,7 @@ export default function AdminDashboard() {
           <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">Recent Orders</h3>
           <div className="space-y-3 text-xs">
             {allOrders.slice(0, 10).map((o) => (
-              <div key={o.id} className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-2">
+              <div key={o.id} className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-2" data-testid={`recent-order-${o.id}`}>
                 <div>
                   <span className="font-bold text-zinc-800 dark:text-zinc-200">#{o.id}</span>
                   <span className="text-zinc-400 ml-2">{o.userName} • {o.date}</span>
