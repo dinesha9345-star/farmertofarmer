@@ -1,0 +1,39 @@
+{
+  "summary": "Full backend API test suite executed against public preview URL. 44/45 tests passed (97.7%). Verified auth (admin/customer/farmer), products CRUD with RBAC, categories, cart, wishlist, orders (cod/upi + razorpay-disabled-400), AI (price-predict, chat SSE, recommend with 4 picks), admin/farmer analytics, image upload+serve, and CORS. Fixed one real backend bug in /api/ai/chat where an unused Optional[dict] param made FastAPI treat the payload as nested, breaking the endpoint (422). After fix, chat SSE streams delta + done as expected. Only failing test is a CORS preflight assertion which is caused by k8s ingress handling OPTIONS before FastAPI (returns allow-origin:* without allow-credentials); FastAPI's own CORSMiddleware is configured correctly with FRONTEND_URL.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "OPTIONS /api/*", "issue": "Kubernetes ingress intercepts CORS preflight and returns 'access-control-allow-origin: *' without 'access-control-allow-credentials: true'. Cookie-based cross-origin auth from other origins would fail. Same-origin and Bearer-token auth are unaffected. Likely infra/ingress config, not app code."},
+      {"endpoint": "POST /api/ai/chat", "issue": "FIXED by testing agent: endpoint signature had 'user: Optional[dict] = None' which FastAPI treated as an additional body field, breaking payload parsing (returned 422). Removed the unused param."}
+    ]
+  },
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Review the /api/ai/chat fix (removed unused user param) in server.py - no functional regression, endpoint is public as intended.",
+    "If cross-origin cookie auth is required, review ingress CORS handling. Current Bearer-token/localStorage fallback already works."
+  ],
+  "critical_code_review_comments": [
+    "server.py is 752 lines - approaching the 700-line split threshold. Consider splitting routes into modules (auth/products/orders/ai/admin).",
+    "Razorpay client initialized at module import; if env keys added later, a restart is required (acceptable).",
+    "_calc_totals subtotal treats fractional prices as ints via round() for gst/delivery — OK, but total keeps float precision; consistent rounding recommended.",
+    "get_current_user is applied per-route rather than via router-level dependency; consistent, but consider a router with dependencies=[Depends(get_current_user)] for authed endpoints to prevent regressions like the ai_chat bug.",
+    "cart 'quantity' on update accepts negative -> deletes; that behavior is fine but not documented in Pydantic (Field(ge=0)) — add validators to reject bad data.",
+    "wishlist toggle uses raw dict body instead of Pydantic model — inconsistent validation.",
+    "verify_farmer returns {ok:true} even when farmer id doesn't exist (update matched 0). Return 404 when no doc updated."
+  ],
+  "updated_files": [
+    "/app/backend/server.py (removed unused user param from ai_chat_stream)",
+    "/app/backend/tests/backend_test.py (created)"
+  ],
+  "success_rate": {"backend": "97.7% (44/45)", "frontend": "not tested (backend-only request)"},
+  "test_credentials": "Used credentials from /app/memory/test_credentials.md: admin@farm2home.com/Farm2Home@2026, customer@farm2home.com/customer123, ramesh@farm2home.com/farmer123, anjali@farm2home.com/farmer123.",
+  "seed_data_creation": "None persistent; tests create and clean up TEST_ prefixed products/orders/users. A few TEST_ users/orders remain in DB by design (register creates a user record).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Run tests with '-n 0' (serial) to avoid parallel cart/order conflicts on the shared customer@farm2home.com account (pytest.ini defaults to -n 2 --dist loadscope). All 45 tests should pass in serial mode. Razorpay is intentionally disabled and asserted to return 400 with 'not configured' message. AI endpoints depend on EMERGENT_LLM_KEY and can take 5-15s.",
+  "rca of the issue": "AI chat 422: FastAPI resolves parameters typed as pydantic/dict without an explicit Query/Header/Depends as request-body params. Adding 'user: Optional[dict] = None' next to a BaseModel body param made FastAPI expect a nested body with fields 'payload' and 'user'. Fix: removed the unused user param. Mitigation going forward: use Depends(get_current_user) with Optional wrapper OR explicit typing to avoid FastAPI treating dicts as body."
+}

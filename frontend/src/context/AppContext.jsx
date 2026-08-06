@@ -1,116 +1,141 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { MOCK_PRODUCTS, MOCK_CATEGORIES, MOCK_FARMERS, MOCK_ORDERS } from '../mock';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import api from '../lib/api';
 import { toast } from 'sonner';
+import { useAuth } from './AuthContext';
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const [userRole, setUserRole] = useState('customer'); // 'customer', 'farmer', 'admin', 'guest'
-  const [currentUser, setCurrentUser] = useState({
-    id: 'c1',
-    name: 'Siddharth Sharma',
-    email: 'siddharth@example.com',
-    role: 'customer',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
-    phone: '+91 98765 43210',
-    location: 'Pune, Maharashtra'
-  });
+  const { user, isAuthed } = useAuth();
 
-  const [products, setProducts] = useState(MOCK_PRODUCTS);
-  const [categories, setCategories] = useState(MOCK_CATEGORIES);
-  const [farmers, setFarmers] = useState(MOCK_FARMERS);
-  const [orders, setOrders] = useState(MOCK_ORDERS);
-  const [cart, setCart] = useState([
-    { product: MOCK_PRODUCTS[0], quantity: 2 },
-    { product: MOCK_PRODUCTS[1], quantity: 1 }
-  ]);
-  const [wishlist, setWishlist] = useState(['p1', 'p3']);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [language, setLanguage] = useState('English'); // English, Tamil, Hindi
-  const [themeMode, setThemeMode] = useState('light'); // light, dark
+  const [language, setLanguage] = useState('English');
+  const [themeMode, setThemeMode] = useState('light');
+  const [loading, setLoading] = useState({ products: false, cart: false });
 
-  // Cart methods
-  const addToCart = (product, qty = 1) => {
-    setCart(prev => {
-      const existing = prev.find(item => item.product.id === product.id);
-      if (existing) {
-        return prev.map(item => 
-          item.product.id === product.id ? { ...item, quantity: item.quantity + qty } : item
-        );
-      }
-      return [...prev, { product, quantity: qty }];
-    });
-    toast.success(`Added ${product.name} to cart!`);
-  };
-
-  const removeFromCart = (productId) => {
-    setCart(prev => prev.filter(item => item.product.id !== productId));
-    toast.info("Item removed from cart");
-  };
-
-  const updateCartQty = (productId, qty) => {
-    if (qty <= 0) {
-      removeFromCart(productId);
-      return;
+  // Load products + categories once
+  const loadProducts = useCallback(async (params = {}) => {
+    setLoading((l) => ({ ...l, products: true }));
+    try {
+      const { data } = await api.get('/products', { params });
+      setProducts(data);
+    } finally {
+      setLoading((l) => ({ ...l, products: false }));
     }
-    setCart(prev => prev.map(item => 
-      item.product.id === productId ? { ...item, quantity: qty } : item
-    ));
-  };
+  }, []);
 
-  const clearCart = () => setCart([]);
+  const loadCategories = useCallback(async () => {
+    const { data } = await api.get('/categories');
+    setCategories(data);
+  }, []);
 
-  // Wishlist methods
-  const toggleWishlist = (productId) => {
-    setWishlist(prev => {
-      if (prev.includes(productId)) {
-        toast.info("Removed from wishlist");
-        return prev.filter(id => id !== productId);
-      } else {
-        toast.success("Added to wishlist!");
-        return [...prev, productId];
-      }
-    });
-  };
+  useEffect(() => {
+    loadProducts();
+    loadCategories();
+  }, [loadProducts, loadCategories]);
 
-  // Add Product (Farmer)
-  const addProduct = (newProd) => {
-    const productWithId = {
-      ...newProd,
-      id: `p-${Date.now()}`,
-      farmerId: currentUser.id,
-      farmerName: currentUser.name,
-      farmerAvatar: currentUser.avatar,
-      rating: 5.0,
-      reviewsCount: 0,
-      salesCount: 0
-    };
-    setProducts(prev => [productWithId, ...prev]);
-    toast.success("New product published successfully!");
-  };
+  // Cart operations (require auth)
+  const loadCart = useCallback(async () => {
+    if (!isAuthed) { setCart([]); return; }
+    try {
+      const { data } = await api.get('/cart');
+      setCart(data.items || []);
+    } catch (_) {}
+  }, [isAuthed]);
 
-  // Switch role helper for testing
-  const switchRole = (role) => {
-    setUserRole(role);
-    if (role === 'customer') {
-      setCurrentUser({ id: 'c1', name: 'Siddharth Sharma', email: 'customer@farm2home.com', role: 'customer', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200' });
-    } else if (role === 'farmer') {
-      setCurrentUser({ id: 'f1', name: 'Ramesh Patil', email: 'farmer@farm2home.com', role: 'farmer', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200' });
-    } else if (role === 'admin') {
-      setCurrentUser({ id: 'a1', name: 'Admin Master', email: 'admin@farm2home.com', role: 'admin', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200' });
+  const loadWishlist = useCallback(async () => {
+    if (!isAuthed) { setWishlist([]); return; }
+    try {
+      const { data } = await api.get('/wishlist');
+      setWishlist(data.items || []);
+    } catch (_) {}
+  }, [isAuthed]);
+
+  const loadOrders = useCallback(async () => {
+    if (!isAuthed) { setOrders([]); return; }
+    try {
+      const { data } = await api.get('/orders');
+      setOrders(data);
+    } catch (_) {}
+  }, [isAuthed]);
+
+  useEffect(() => {
+    loadCart();
+    loadWishlist();
+    loadOrders();
+  }, [loadCart, loadWishlist, loadOrders]);
+
+  const addToCart = async (product, qty = 1) => {
+    if (!isAuthed) { toast.error('Please sign in to add items to your cart'); return; }
+    try {
+      const { data } = await api.post('/cart/add', { productId: product.id, quantity: qty });
+      setCart(data.items || []);
+      toast.success(`Added ${product.name} to cart!`);
+    } catch (e) {
+      toast.error('Could not add to cart');
     }
-    toast.success(`Switched role to ${role.toUpperCase()}`);
+  };
+
+  const removeFromCart = async (productId) => {
+    const { data } = await api.post('/cart/update', { productId, quantity: 0 });
+    setCart(data.items || []);
+    toast.info('Item removed from cart');
+  };
+
+  const updateCartQty = async (productId, quantity) => {
+    const { data } = await api.post('/cart/update', { productId, quantity });
+    setCart(data.items || []);
+  };
+
+  const clearCart = async () => {
+    await api.post('/cart/clear');
+    setCart([]);
+  };
+
+  const toggleWishlist = async (productId) => {
+    if (!isAuthed) { toast.error('Please sign in to use wishlist'); return; }
+    const { data } = await api.post('/wishlist/toggle', { productId });
+    setWishlist(data.items || []);
+    toast.success(data.items.includes(productId) ? 'Added to wishlist!' : 'Removed from wishlist');
+  };
+
+  const addProduct = async (newProd) => {
+    try {
+      const { data } = await api.post('/products', newProd);
+      setProducts((prev) => [data, ...prev]);
+      toast.success('Harvest published successfully!');
+      return data;
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'Could not publish harvest');
+      throw e;
+    }
+  };
+
+  const uploadImage = async (file) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    const { data } = await api.post('/upload/image', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+    return data;
   };
 
   return (
     <AppContext.Provider value={{
-      userRole, setUserRole, currentUser, setCurrentUser,
-      products, setProducts, categories, farmers, orders, setOrders,
+      user,
+      products, setProducts, loadProducts,
+      categories,
       cart, addToCart, removeFromCart, updateCartQty, clearCart,
-      wishlist, toggleWishlist, addProduct,
+      wishlist, toggleWishlist,
+      orders, setOrders, loadOrders,
       searchQuery, setSearchQuery, selectedCategory, setSelectedCategory,
-      language, setLanguage, themeMode, setThemeMode, switchRole
+      language, setLanguage, themeMode, setThemeMode,
+      addProduct, uploadImage,
+      loading,
     }}>
       {children}
     </AppContext.Provider>
