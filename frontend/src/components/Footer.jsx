@@ -1,8 +1,10 @@
 import React from 'react';
 import { Leaf, ShieldCheck, HeartHandshake, Award, PhoneCall, Mail, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useApp } from '../context/AppContext';
 
 export default function Footer() {
+  const { t } = useApp();
   return (
     <footer className="bg-zinc-900 text-zinc-300 pt-16 pb-12 border-t border-emerald-900/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,8 +15,8 @@ export default function Footer() {
               <Leaf className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-bold text-white text-sm">100% Farm Fresh</h4>
-              <p className="text-xs text-zinc-400">Harvested within 24 hours of dispatch</p>
+              <h4 className="font-bold text-white text-sm">{t('100% Farm Fresh')}</h4>
+              <p className="text-xs text-zinc-400">{t('Harvested within 24 hours of dispatch')}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -22,8 +24,8 @@ export default function Footer() {
               <HeartHandshake className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-bold text-white text-sm">Zero Middlemen</h4>
-              <p className="text-xs text-zinc-400">Fair pricing empowering direct farmers</p>
+              <h4 className="font-bold text-white text-sm">{t('Zero Middlemen')}</h4>
+              <p className="text-xs text-zinc-400">{t('Fair pricing empowering direct farmers')}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -31,8 +33,8 @@ export default function Footer() {
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-bold text-white text-sm">Secure & Certified</h4>
-              <p className="text-xs text-zinc-400">Lab tested organic & pesticide-free</p>
+              <h4 className="font-bold text-white text-sm">{t('Secure & Certified')}</h4>
+              <p className="text-xs text-zinc-400">{t('Lab tested organic & pesticide-free')}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -71,7 +73,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h5 className="font-bold text-white text-xs uppercase tracking-wider mb-4">Marketplace</h5>
+            <h5 className="font-bold text-white text-xs uppercase tracking-wider mb-4">{t('Marketplace')}</h5>
             <ul className="space-y-2.5 text-xs text-zinc-400">
               <li><Link to="/products" className="hover:text-emerald-400 transition">Organic Fruits</Link></li>
               <li><Link to="/products" className="hover:text-emerald-400 transition">Fresh Vegetables</Link></li>
@@ -82,7 +84,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h5 className="font-bold text-white text-xs uppercase tracking-wider mb-4">Farmer Portal</h5>
+            <h5 className="font-bold text-white text-xs uppercase tracking-wider mb-4">{t('Farmer Portal')}</h5>
             <ul className="space-y-2.5 text-xs text-zinc-400">
               <li><Link to="/farmer-dashboard" className="hover:text-emerald-400 transition">Farmer Registration</Link></li>
               <li><Link to="/farmer-dashboard" className="hover:text-emerald-400 transition">Upload Harvest</Link></li>
@@ -92,7 +94,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h5 className="font-bold text-white text-xs uppercase tracking-wider mb-4">Company & Legal</h5>
+            <h5 className="font-bold text-white text-xs uppercase tracking-wider mb-4">{t('Company & Legal')}</h5>
             <ul className="space-y-2.5 text-xs text-zinc-400">
               <li><Link to="/about" className="hover:text-emerald-400 transition">About Our Mission</Link></li>
               <li><Link to="/terms" className="hover:text-emerald-400 transition">Terms & Conditions</Link></li>

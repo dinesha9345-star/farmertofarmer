@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import api from '../lib/api';
 import { toast } from 'sonner';
 import { useAuth } from './AuthContext';
+import { translate } from '../i18n/translations';
 
 const AppContext = createContext();
 
@@ -15,9 +16,15 @@ export const AppProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [language, setLanguage] = useState('English');
+  const [language, setLanguage] = useState(() => localStorage.getItem('farm2home_lang') || 'English');
   const [themeMode, setThemeMode] = useState('light');
   const [loading, setLoading] = useState({ products: false, cart: false });
+
+  useEffect(() => {
+    localStorage.setItem('farm2home_lang', language);
+  }, [language]);
+
+  const t = useCallback((key) => translate(key, language), [language]);
 
   // Load products + categories once
   const loadProducts = useCallback(async (params = {}) => {
@@ -133,7 +140,7 @@ export const AppProvider = ({ children }) => {
       wishlist, toggleWishlist,
       orders, setOrders, loadOrders,
       searchQuery, setSearchQuery, selectedCategory, setSelectedCategory,
-      language, setLanguage, themeMode, setThemeMode,
+      language, setLanguage, themeMode, setThemeMode, t,
       addProduct, uploadImage,
       loading,
     }}>

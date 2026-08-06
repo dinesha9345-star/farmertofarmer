@@ -5,7 +5,7 @@ import { Leaf, ShoppingBag, Heart, ShieldCheck, Search, Menu, X, Sparkles, LogOu
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 export default function Navbar() {
-  const { cart, wishlist, searchQuery, setSearchQuery, language, setLanguage } = useApp();
+  const { cart, wishlist, searchQuery, setSearchQuery, language, setLanguage, t } = useApp();
   const { user, isAuthed, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -21,8 +21,8 @@ export default function Navbar() {
       <div className="bg-emerald-800 text-emerald-50 text-xs py-1.5 px-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <span className="flex items-center gap-1 font-medium"><Leaf className="w-3.5 h-3.5 text-emerald-300" /> 100% Direct From Farmers • Zero Middlemen • Fair Pricing</span>
-            <span className="hidden md:inline-block text-emerald-200">| Helpline: +91 93454 67520 • dinesha9345@gmail.com</span>
+            <span className="flex items-center gap-1 font-medium"><Leaf className="w-3.5 h-3.5 text-emerald-300" /> {t('100% Direct From Farmers • Zero Middlemen • Fair Pricing')}</span>
+            <span className="hidden md:inline-block text-emerald-200">| {t('Helpline')}: +91 93454 67520 • dinesha9345@gmail.com</span>
           </div>
           <div className="flex items-center space-x-3">
             <select
@@ -40,7 +40,7 @@ export default function Navbar() {
                 {role?.toUpperCase()}
               </span>
             ) : (
-              <Link to="/login" className="bg-amber-500 hover:bg-amber-400 text-zinc-950 px-2 py-0.5 rounded text-xs font-semibold" data-testid="signin-top">Sign In</Link>
+              <Link to="/login" className="bg-amber-500 hover:bg-amber-400 text-zinc-950 px-2 py-0.5 rounded text-xs font-semibold" data-testid="signin-top">{t('Sign In')}</Link>
             )}
           </div>
         </div>
@@ -64,7 +64,7 @@ export default function Navbar() {
           <Search className="absolute left-3.5 w-4 h-4 text-zinc-400" />
           <input
             type="text"
-            placeholder="Search fresh mangoes, organic honey, rice, vegetables, farmers..."
+            placeholder={t('Search fresh mangoes, organic honey, rice, vegetables, farmers...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && navigate('/products')}
@@ -76,7 +76,7 @@ export default function Navbar() {
             className="absolute right-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-1.5 rounded-full font-medium transition"
             data-testid="search-submit-btn"
           >
-            Search
+            {t('Search')}
           </button>
         </div>
 
@@ -87,19 +87,19 @@ export default function Navbar() {
             data-testid="nav-ai-hub"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>AI Hub</span>
+            <span>{t('AI Hub')}</span>
           </Link>
 
           {role === 'farmer' && (
             <Link to="/farmer-dashboard" className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition" data-testid="nav-farmer-dashboard">
               <LayoutDashboard className="w-4 h-4" />
-              <span className="hidden sm:inline">Farmer Hub</span>
+              <span className="hidden sm:inline">{t('Farmer Hub')}</span>
             </Link>
           )}
           {role === 'admin' && (
             <Link to="/admin-dashboard" className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition" data-testid="nav-admin-dashboard">
               <ShieldCheck className="w-4 h-4" />
-              <span className="hidden sm:inline">Admin</span>
+              <span className="hidden sm:inline">{t('Admin')}</span>
             </Link>
           )}
 
@@ -136,9 +136,9 @@ export default function Navbar() {
                     <div className="text-xs font-bold text-zinc-800 dark:text-zinc-100">{user.name}</div>
                     <div className="text-[10px] text-zinc-400">{user.email}</div>
                   </div>
-                  {(role === 'customer' || !role) && <Link to="/orders" onClick={() => setUserMenuOpen(false)} className="block px-3 py-2 text-xs hover:bg-emerald-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200" data-testid="menu-orders">📦 My Orders</Link>}
+                  {(role === 'customer' || !role) && <Link to="/orders" onClick={() => setUserMenuOpen(false)} className="block px-3 py-2 text-xs hover:bg-emerald-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200" data-testid="menu-orders">📦 {t('My Orders')}</Link>}
                   <button onClick={() => { logout(); setUserMenuOpen(false); navigate('/'); }} className="w-full text-left px-3 py-2 text-xs hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 flex items-center gap-2" data-testid="menu-logout">
-                    <LogOut className="w-3.5 h-3.5" /> Sign Out
+                    <LogOut className="w-3.5 h-3.5" /> {t('Sign Out')}
                   </button>
                 </div>
               )}
@@ -146,7 +146,7 @@ export default function Navbar() {
           ) : (
             <Link to="/login" className="flex items-center gap-1.5 border border-emerald-600 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-3.5 py-2 rounded-full text-xs font-bold transition" data-testid="nav-login-btn">
               <LogIn className="w-4 h-4" />
-              <span>Sign In</span>
+              <span>{t('Sign In')}</span>
             </Link>
           )}
 
