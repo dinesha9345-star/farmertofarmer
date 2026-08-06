@@ -22,7 +22,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <span className="flex items-center gap-1 font-medium"><Leaf className="w-3.5 h-3.5 text-emerald-300" /> 100% Direct From Farmers • Zero Middlemen • Fair Pricing</span>
-            <span className="hidden md:inline-block text-emerald-200">| Helpline: 1800-FARM-2-HOME</span>
+            <span className="hidden md:inline-block text-emerald-200">| Helpline: +91 93454 67520 • dinesha9345@gmail.com</span>
           </div>
           <div className="flex items-center space-x-3">
             <select

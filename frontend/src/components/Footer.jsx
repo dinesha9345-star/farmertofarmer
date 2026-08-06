@@ -66,7 +66,7 @@ export default function Footer() {
             </div>
             <div className="flex items-center gap-3 text-xs text-zinc-400">
               <PhoneCall className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-              <span>+91 (1800) 327-4663 • support@farm2home.org</span>
+              <span>+91 93454 67520 • dinesha9345@gmail.com</span>
             </div>
           </div>
 
