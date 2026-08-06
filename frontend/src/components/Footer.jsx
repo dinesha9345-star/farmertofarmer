@@ -42,8 +42,8 @@ export default function Footer() {
               <Award className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-bold text-white text-sm">Live GPS Tracking</h4>
-              <p className="text-xs text-zinc-400">Real-time transit from village to doorstep</p>
+              <h4 className="font-bold text-white text-sm">{t('Live GPS Tracking')}</h4>
+              <p className="text-xs text-zinc-400">{t('Real-time transit from village to doorstep')}</p>
             </div>
           </div>
         </div>

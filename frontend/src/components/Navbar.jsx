@@ -115,7 +115,7 @@ export default function Navbar() {
               </Link>
               <Link to="/cart" className="relative flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-full text-xs font-semibold shadow-md transition" data-testid="nav-cart-link">
                 <ShoppingBag className="w-4 h-4" />
-                <span className="hidden sm:inline">Cart</span>
+                <span className="hidden sm:inline">{t('Cart')}</span>
                 {cartItemsCount > 0 && (
                   <span className="bg-amber-500 text-zinc-950 font-extrabold text-[11px] px-1.5 py-0.5 rounded-full">
                     {cartItemsCount}
