@@ -1,0 +1,37 @@
+{
+  "summary": "Frontend end-to-end testing of Farm2Home. Landing, login (customer/farmer/admin quick buttons), registration testids, product detail, cart, wishlist, checkout with UPI (order created and visible on /orders), AI Hub (predictions + streaming chat + recommendations), farmer product creation, admin dashboard stats and lists, language selector, and logout+redirect all working. One critical page crash reproduced on direct navigation to /product/:id when products context is empty.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "ProductDetailPage.jsx (line 12-13, 19, 34)", "issue": "Crashes with 'Cannot read properties of undefined (reading minOrderQty)' when navigating directly to /product/:id if products list is still loading (products[0] is undefined). Reproducible by opening /product/p1 in a fresh tab/hard refresh. Home page click works because products are already fetched.", "selector": "add-to-cart-detail-btn (page never renders)", "priority": "HIGH"},
+      {"component": "AdminDashboard - Farmer Verification & KYC list", "issue": "Farmer rows have no data-testid (e.g., verify-farmer-<id>). Testability gap; UI itself renders 6 farmers correctly.", "selector": "N/A", "priority": "LOW"},
+      {"component": "AdminDashboard - Recent Orders list", "issue": "Order rows have no data-testid (e.g., recent-order-<id>). Testability gap; UI shows 9 orders.", "selector": "N/A", "priority": "LOW"},
+      {"component": "WishlistPage.jsx", "issue": "Wishlist items are rendered but do not carry the product-card-<id> data-testid used elsewhere. Only nav-wishlist-link testid found on the page.", "selector": "product-card-p2 (missing on /wishlist)", "priority": "LOW"},
+      {"component": "AdminDashboard stat-farmers card", "issue": "Sub-caption reads 'X customers' underneath 'VERIFIED FARMERS' count, which is confusing (mixing farmer count with customer count label).", "selector": "stat-farmers", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "AdminDashboard", "issues": ["Verified Farmers card subtitle labels the number as 'customers' - misleading copy"]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Fix ProductDetailPage to guard against empty products (e.g., show loader while products.length===0 or fetch product by id via API) and avoid product[0] fallback that breaks when array is empty.",
+    "Add data-testid to admin farmer verification rows (verify-farmer-<id>) and recent order rows (recent-order-<id>) for reliable automation.",
+    "Add product-card-<id> data-testid to wishlist items to match the pattern used elsewhere.",
+    "Clarify stat-farmers subtitle copy on admin dashboard."
+  ],
+  "critical_code_review_comments": [
+    "ProductDetailPage line 12 uses `products.find(...) || products[0]` which throws if products is empty; treat undefined product as loading/not-found state.",
+    "Multiple 401s on initial anonymous load from /api/auth/me are noisy in console - consider suppressing or handling silently.",
+    "Language selector is visual-only (values 'Tamil'/'Hindi'); no i18n wiring - acceptable per PRD but worth noting."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not-tested (skipped per request)", "frontend": "~92% (12/13 flows pass; product-detail direct-nav crash is the main defect)"},
+  "test_credentials": "admin@farm2home.com/Farm2Home@2026, customer@farm2home.com/customer123, ramesh@farm2home.com/farmer123 - all working via quick-* login buttons",
+  "seed_data_creation": "Created test product 'Test Turmeric' via farmer dashboard (Ramesh) and 1 UPI order (~₹238) via customer checkout. Wishlisted product p2. May want cleanup for a clean rerun.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All quick-login buttons work but they only pre-fill the form; the tester must still click login-submit. ProductDetailPage /product/:id direct-load crashes on empty products array; use Home page click flow (via inner cursor-pointer div) to open detail page reliably in tests. Language selector option values are 'English'/'Tamil'/'Hindi' (not 'en'/'ta'/'hi').",
+  "rca_of_the_issue": "ProductDetailPage.jsx uses `const product = products.find(p => p.id === id) || products[0]` at line 12. When the route mounts before AppContext finishes loading /api/products, `products` is [], so `product` becomes undefined. Subsequent access `product.minOrderQty` (line 13) and `product.farmerName` (line 19) throw. Fix: show a loading skeleton while `products.length === 0`, or fetch the product from /api/products/:id directly, and render a 404 UI if not found. Do not fall back to products[0]."
+}
